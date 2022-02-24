@@ -3,8 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Authors>TamaoDev</Authors>
-    <Description>Librería para facilitar el uso de Dapper en C#</Description>
+    <Description>Library for easy use of Dapper in C#</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Product>ConnectDap</Product>
+    <Copyright>Copyright © 2022</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
