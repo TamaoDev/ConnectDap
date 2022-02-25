@@ -90,33 +90,37 @@ namespace ConnectDap.Lib
 
             _connection.Open();
 
-            using var transaction = _connection.BeginTransaction();
-            try
+            using (var transaction = _connection.BeginTransaction())
             {
-                DynamicParameters parametersMaestro = new DynamicParameters(maestro);
-                queryMaestro = queryMaestro.ToUpper().Contains("INSERT INTO") ? queryMaestro + ";select cast(SCOPE_IDENTITY() as bigint)" : queryMaestro;
-                long id = idMaestro == 0 ? await _connection.QuerySingleAsync<int>(queryMaestro, parametersMaestro, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false) :
-                    await _connection.ExecuteAsync(queryMaestro, parametersMaestro, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false);
-                id = idMaestro == 0 ? id : idMaestro;
-                foreach (T2 item in detalle)
+
+                try
                 {
-                    DynamicParameters parametersDetalle = new DynamicParameters(item);
-                    parametersDetalle.Add("@idMaestro", id);
-                    await _connection.ExecuteAsync(queryDetalle, parametersDetalle, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false);
+                    DynamicParameters parametersMaestro = new DynamicParameters(maestro);
+                    queryMaestro = queryMaestro.ToUpper().Contains("INSERT INTO") ? queryMaestro + ";select cast(SCOPE_IDENTITY() as bigint)" : queryMaestro;
+                    long id = idMaestro == 0 ? await _connection.QuerySingleAsync<int>(queryMaestro, parametersMaestro, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false) :
+                        await _connection.ExecuteAsync(queryMaestro, parametersMaestro, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false);
+                    id = idMaestro == 0 ? id : idMaestro;
+                    foreach (T2 item in detalle)
+                    {
+                        DynamicParameters parametersDetalle = new DynamicParameters(item);
+                        parametersDetalle.Add("@idMaestro", id);
+                        await _connection.ExecuteAsync(queryDetalle, parametersDetalle, transaction: transaction, commandType: CommandType.Text).ConfigureAwait(false);
+                    }
+
+                    transaction.Commit();
+                    _connection.Close();
+                    return id;
                 }
+                catch (Exception)
+                {
 
-                transaction.Commit();
-                _connection.Close();
-                return id;
+                    transaction.Rollback();
+                    _connection.Close();
+                    return 0;
+
+                }
             }
-            catch (Exception)
-            {
 
-                transaction.Rollback();
-                _connection.Close();
-                return 0;
-
-            }
         }
         protected async Task<IEnumerable<T>> ExecuteQuery<T>(string query, DynamicParameters parameters = null, bool iSprocedure = false, bool withParameters = false)
         {
