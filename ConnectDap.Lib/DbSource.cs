@@ -28,7 +28,8 @@ namespace ConnectDap.Lib
         {
             _connection = connection;
         }
-
+ 
+        
         /// <summary>
         /// Ejecuta una consulta SQL y devuelve una colección de resultados de tipo T.
         /// </summary>
