@@ -12,6 +12,7 @@
 	<PackageId>ConnectDap.Lib</PackageId>
 	<PackageTags>orm c# Dapper</PackageTags>
 	  <Title>ConnectDapper Librery</Title>
+	  <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
